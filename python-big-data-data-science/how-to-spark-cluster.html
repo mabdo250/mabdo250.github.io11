@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+            <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+        <title>How to configure an Apache Spark standalone cluster and integrate with Jupyter: Step-by-Step</title>
+
+            <link href="http://mabdo250.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Mohamed Abdo Full Atom Feed" />
+            <link href="http://mabdo250.github.io/feeds/{'slug': 'python-big-data-data-science'}.atom.xml" type="application/atom+xml" rel="alternate" title="Mohamed Abdo Categories Atom Feed" />
+        <!-- Bootstrap Core CSS -->
+        <link href="../theme/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- Custom CSS -->
+        <link href="../theme/css/clean-blog.min.css" rel="stylesheet">
+
+        <!-- Code highlight color scheme -->
+            <link href="../theme/css/code_blocks/github.css" rel="stylesheet">
+
+            <!-- CSS specified by the user -->
+            <link href="../static/css/custom.css" rel="stylesheet">
+
+        <!-- Custom Fonts -->
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+
+
+        <meta name="description" content="The definitive tutorial">
+
+        <meta name="author" content="David Adrián Cañones Castellano">
+
+        <meta name="tags" content="Apache Spark">
+        <meta name="tags" content="Python">
+        <meta name="tags" content="Big Data">
+        <meta name="tags" content="Jupyter">
+        <meta name="tags" content="Data Science">
+
+	                <meta property="og:locale" content="en_US.UTF-8">
+		<meta property="og:site_name" content="Mohamed Abdo">
+            <meta property="og:image" content="../images/main_header/data3.jpg">
+
+	<meta property="og:type" content="article">
+            <meta property="article:author" content="../author/david-adrian-canones-castellano.html">
+	<meta property="og:url" content="../python-big-data-data-science/how-to-spark-cluster.html">
+	<meta property="og:title" content="How to configure an Apache Spark standalone cluster and integrate with Jupyter: Step-by-Step">
+	<meta property="article:published_time" content="2017-08-17 00:00:00+02:00">
+            <meta property="og:description" content="The definitive tutorial">
+
+            <meta property="og:image" content="../images/posts/spark_cluster/spark.jpg">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:site" content="@msalah_abdo">
+        <meta name="twitter:title" content="How to configure an Apache Spark standalone cluster and integrate with Jupyter: Step-by-Step">
+
+            <meta name="twitter:image" content="../images/posts/spark_cluster/spark.jpg">
+
+            <meta name="twitter:description" content="The definitive tutorial">
+</head>
+
+<body class="article-how-to-spark-cluster">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="../">Mohamed Abdo</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+
+                            <li><a href="../pages/About/">About</a></li>
+                            <li><a href="../pages/Contact/">Contact</a></li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Header -->
+        <header class="intro-header" style="background-image: url('../images/posts/spark_cluster/spark.jpg')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="post-heading">
+                        <h1>How to configure an Apache Spark standalone cluster and integrate with Jupyter: Step-by-Step</h1>
+                            <h3 class="subheading">The definitive tutorial</h3>
+                        <span class="meta">Posted by
+                                <a href="../author/david-adrian-canones-castellano.html">David Adrián Cañones Castellano</a>
+                             on Thu 17 August 2017
+                        </span>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+    <!-- Post Content -->
+    <article>
+        <h2>What is&nbsp;Spark?</h2>
+<p>Spark is a framework to make computations with large amounts of data. Why do you need something like Spark? Think for
+example about a small dataset that fit easily into memory, let&#8217;s say some Gb maximum. You will probably load the entire 
+dataframe using Pandas, R or your tool of choice and after some quick cleaning and visualization you will be almost done
+ with no major hassles related with computing performance if you are using a proper computer (or cloud&nbsp;infrastructure).  </p>
+<p>Now think that you have to process a 1Tb (or bigger) dataset and train a <span class="caps">ML</span> algorithm on it. Even with a powerful computer 
+it is crazy. Spark gives you two features you need to handle these data&nbsp;monsters:</p>
+<ul>
+<li><strong>Parallel computing</strong>: you use not one but many computers to speed your&nbsp;calculations.</li>
+<li><strong>Fault tolerance</strong>: you must be able to recover if one of your computers hangs in the middle of the&nbsp;process.</li>
+</ul>
+<p><a href="https://jaceklaskowski.gitbooks.io/mastering-apache-spark/spark-overview.html">How Spark works internally</a> is out 
+of the scope of this tutorial and I will asume you are already familiar with that. Anyway you will need little 
+knowledge about Spark&#8217;s internals to set up and run you own cluster at&nbsp;home.</p>
+<h2>What is a Spark cluster and what does &#8216;standalone&#8217;&nbsp;mean?</h2>
+<h3>Spark&nbsp;clusters</h3>
+<p>A Spark cluster is just some computers running Spark and working together. A cluster consist&nbsp;on:</p>
+<ul>
+<li><strong>Master</strong>: is one of the computers that orchestrate how everything works. It distributes the work and take care of&nbsp;everything.</li>
+<li><strong>Slaves</strong>: these are the computers that get the job done. They process chunks of your massive datasets following the Map 
+Reduce paradigm. A computer can be master and slave at the same&nbsp;time.</li>
+</ul>
+<h3>Standalone</h3>
+<p>It just mean that Spark is installed in every computer involved in the cluster. The cluster manager in use is provided 
+by Spark. There are other cluster managers like Apache Mesos and Hadoop <span class="caps">YARN</span>.</p>
+<h2>Requirements</h2>
+<p>To follow this tutorial you&nbsp;need:</p>
+<ul>
+<li>A couple of computers (minimum): this is a&nbsp;cluster.</li>
+<li>Linux: it should also work for <span class="caps">OSX</span>, you have to be able to run shell scripts. I have not seen Spark running on native 
+windows so&nbsp;far.</li>
+</ul>
+<p>For this tutorial I have used a MacBook Air with Ubuntu 17.04 and my desktop system with Windows 10 running
+ <a href="https://msdn.microsoft.com/es-es/commandline/wsl/install_guide">Linux Subsystem for Windows</a> (yeah!) with Ubuntu 16.04 <span class="caps">LTS</span>.</p>
+<p>If you don&#8217;t meet these simple requirements, please don&#8217;t panic, follow this steps and you are&nbsp;done:</p>
+<ul>
+<li>Download <a href="https://www.virtualbox.org/">Oracle Virtualbox</a>.</li>
+<li>Download <a href="https://www.ubuntu.com/download/desktop">Linux</a>.</li>
+<li><a href="http://www.psychocats.net/ubuntu/virtualbox">Create a Virtual Machine in Virtualbox and install Linux on it</a>.</li>
+<li><a href="https://protechgurus.com/clone-virtual-machine-virtualbox/">Clone that <span class="caps">VM</span></a> after following the installation tutorial&nbsp;steps.</li>
+</ul>
+<p>And that&#8217;s all, you have 2 Linux machines to run your&nbsp;cluster.</p>
+<div class="alert alert-warning alert-dismissible">
+    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+    <strong>Warning</strong>: using 2 virtual machines running on the same computer is <span class="caps">OK</span> for learning and prototyping
+     purposes but you will lose any performance improvement you would have using a real cluster!
+</div>
+
+<h2>Tutorial</h2>
+<h3>Step 1: Install&nbsp;Java</h3>
+<p><strong>Note:</strong> you will have to perform this step for all machines&nbsp;involved.</p>
+<p>Spark needs Java to run. My recommendation is going with Open <span class="caps">JDK8</span>. Go to your Terminal and write the following&nbsp;commands:</p>
+<div class="highlight"><pre><span></span>$ sudo apt-get update
+$ sudo apt-get upgrade
+$ sudo apt-get install openjdk-8-jdk
+</pre></div>
+
+
+<p>Test your Java installation&nbsp;typing:</p>
+<div class="highlight"><pre><span></span>$ java -version
+</pre></div>
+
+
+<p>You should see the following&nbsp;output:</p>
+<div class="highlight"><pre><span></span><span class="err">openjdk version &quot;1.8.0_131&quot;</span>
+<span class="err">OpenJDK Runtime Environment (build 1.8.0_131-8u131-b11-2ubuntu1.17.04.3-b11)</span>
+<span class="err">OpenJDK 64-Bit Server VM (build 25.131-b11, mixed mode)</span>
+</pre></div>
+
+
+<h3>Step 2: Install&nbsp;Spark</h3>
+<p><a href="https://d3kbcqa49mib13.cloudfront.net/spark-2.2.0-bin-hadoop2.7.tgz">Download</a> Spark. I have used 2.2.0 pre-built for 
+this tutorial. You can go to <a href="https://spark.apache.org/downloads.html">Spark download page</a> and download it from there 
+or in case you don&#8217;t have access to a graphical desktop and have to use command line just&nbsp;run:</p>
+<div class="highlight"><pre><span></span>$ curl -O https://d3kbcqa49mib13.cloudfront.net/spark-2.2.0-bin-hadoop2.7.tgz
+</pre></div>
+
+
+<p>After that you will have the compressed source of Spark in your home directory. Uncompress the code and move the resulting
+folder to your home (recommended but not necessary) in case you downloaded it in Downloads&nbsp;folder.</p>
+<p>Uncompress:</p>
+<div class="highlight"><pre><span></span>$ tar zxvf spark-2.2.0-bin-hadoop2.7.tgz
+</pre></div>
+
+
+<p>And move&nbsp;(optional):</p>
+<div class="highlight"><pre><span></span>$ mv spark-2.2.0-bin-hadoop2.7 ~
+</pre></div>
+
+
+<p>Finally you will set the needed environment variable <code>SPARK_HOME</code>.</p>
+<p>Go to your home directory and open with a text editor the &#8216;.bashrc&#8217;&nbsp;file:</p>
+<div class="highlight"><pre><span></span>$ <span class="nb">cd</span> ~
+$ sudo nano .bashrc
+</pre></div>
+
+
+<p>Add the following lines at the end of the file. It will set up the variable properly when your turn on your computer or
+start a session. Take into account that folder name will change in the future and will not match the one written here, 
+but the procedure is&nbsp;similar.</p>
+<div class="highlight"><pre><span></span># Spark
+export SPARK_HOME=&quot;/home/&lt;your_username&gt;/spark-2.2.0-bin-hadoop2.7/&quot;
+</pre></div>
+
+
+<p>Save the file. If you are using nano just do <kbd>ctrl</kbd>+<kbd>x</kbd>, write <code>y</code> and press <kbd>return</kbd> to get 
+it&nbsp;done.</p>
+<p>Now you can check your Spark installation. Go to Spark folder and execute&nbsp;pyspark:</p>
+<div class="highlight"><pre><span></span>$ <span class="nb">cd</span> spark-2.2.0-bin-hadoop2.7
+$ bin/pyspark
+</pre></div>
+
+
+<p>If everything is properly installed you should see an output similar to&nbsp;this:</p>
+<div class="highlight"><pre><span></span>Python 3.6.1 |Anaconda custom (64-bit)| (default, May 11 2017, 13:09:58) 
+[GCC 4.4.7 20120313 (Red Hat 4.4.7-1)] on linux
+Type &quot;help&quot;, &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.
+Using Spark&#39;s default log4j profile: org/apache/spark/log4j-defaults.properties
+Setting default log level to &quot;WARN&quot;.
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+17/08/17 20:39:03 WARN Utils: Your hostname, david-MacBookAir resolves to a loopback address: 127.0.1.1; using 192.168.1.143 instead (on interface wlp2s0)
+17/08/17 20:39:03 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
+17/08/17 20:39:13 WARN ObjectStore: Version information not found in metastore. hive.metastore.schema.verification is not enabled so recording the schema version 1.2.0
+17/08/17 20:39:13 WARN ObjectStore: Failed to get database default, returning NoSuchObjectException
+17/08/17 20:39:14 WARN ObjectStore: Failed to get database global_temp, returning NoSuchObjectException
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  &#39;_/
+   /__ / .__/\_,_/_/ /_/\_\   version 2.2.0
+      /_/
+
+Using Python version 3.6.1 (default, May 11 2017 13:09:58)
+SparkSession available as &#39;spark&#39;.
+</pre></div>
+
+
+<p>Up to this point, you may see this warning at Spark&nbsp;initialization:</p>
+<div class="highlight"><pre><span></span>WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable&quot;.
+</pre></div>
+
+
+<p>To solve this problem, we will have to install Hadoop. This is optional because Spark is going to run anyway, but I guess 
+there must be some performance improvements of using native Hadoop over some kind of&nbsp;adapters.</p>
+<h3>Step 3 (Optional): Installing&nbsp;Hadoop</h3>
+<p>The process of installing Hadoop is pretty much the same as Spark, and I will go over it quickly. This is an optional step 
+and is not strictly necessary to run your cluster. You can also decide to do it later. The steps for installing Hadoop&nbsp;are:</p>
+<ul>
+<li>Download Hadoop source <a href="http://apache.rediris.es/hadoop/common/stable/">here</a>. You are free 
+to install whatever version you like, but make sure you choose a version &gt; 2.7 because it&#8217;s a Spark&#8217;s requirement. This
+  is pretty much the same as we did before with Spark. Feel free to use equivalent command line&nbsp;expressions.</li>
+<li>Uncompress in your home&nbsp;directory.</li>
+<li>Add the following lines at the end of your <code>.bashrc</code> file: </li>
+</ul>
+<div class="highlight"><pre><span></span># Hadoop
+export HADOOP_HOME=&quot;/home/&lt;your_username&gt;/hadoop-2.8.0&quot;
+export LD_LIBRARY_PATH=$HADOOP_HOME/lib/native:$LD_LIBRARY_PATH
+</pre></div>
+
+
+<ul>
+<li>Test your Hadoop installation by starting pyspark and make sure you don&#8217;t see the&nbsp;warning.</li>
+</ul>
+<h3>Step 4: Launch the master&nbsp;server</h3>
+<p>Previous to launch the master server, you must check your ip to pass it as the host parameter. Type the following&nbsp;command:</p>
+<div class="highlight"><pre><span></span>$ ifconfig
+</pre></div>
+
+
+<p>You should see an output similar to&nbsp;this:</p>
+<div class="highlight"><pre><span></span>lo: flags=73&lt;UP,LOOPBACK,RUNNING&gt;  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10&lt;host&gt;
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 3735  bytes 7174785 (7.1 MB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 3735  bytes 7174785 (7.1 MB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+wlp2s0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500
+        inet 192.168.1.143  netmask xxx.xxx.xxx.x  broadcast xxx.xxx.x.xxx
+        inet6 xxxx::xxxx:xxxx:xxxx:xxxx  prefixlen 64  scopeid 0x20&lt;link&gt;
+        ether 14:10:9f:f3:a0:5e  txqueuelen 1000  (Ethernet)
+        RX packets 67543  bytes 60399180 (60.3 MB)
+        RX errors 0  dropped 0  overruns 0  frame 119733
+        TX packets 52684  bytes 11712399 (11.7 MB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+        device interrupt 17  
+</pre></div>
+
+
+<p>Copy the <code>inet</code> value inthe second text block. This is going to be <code>&lt;your_master_ip&gt;</code>. In this example you should copy <code>192.168.1.143</code>.</p>
+<p>Now, go to your Spark installation directory and&nbsp;type:</p>
+<div class="highlight"><pre><span></span>$ ./sbin/start-master.sh -h &lt;your_master_ip_&gt;
+</pre></div>
+
+
+<p>You should see an output similar&nbsp;to:</p>
+<div class="highlight"><pre><span></span>starting org.apache.spark.deploy.master.Master, logging to /home/&lt;your_username&gt;/spark-2.2.0-bin-hadoop2.7//logs/spark-&lt;your_username&gt;-org.apache.spark.deploy.master.Master-1-&lt;your_username&gt;-MacBookAir.out
+</pre></div>
+
+
+<p>Now you can go to <code>localhost:8080</code> in the same computer where you started the master server, or to <code>&lt;your_master_ip&gt;:8080</code> in 
+case you don&#8217;t have access to a web browser but have other devices connected to the same private network (e.g. a phone).
+In that <span class="caps">URL</span> you have access to the master server web user&nbsp;interface.</p>
+<p><img alt="master web ui" src="{static}/images/posts/spark_cluster/master_web_ui.png" title="Master Web UI"></p>
+<p>In this web you can see just behind Spark logo an <span class="caps">URL</span> parameter similar to <code>spark://&lt;your_master_ip&gt;:7077</code>. This <span class="caps">URL</span> is 
+very important because is the one you are going to need when connecting slaves to your cluster and I will name it <code>&lt;your_master_url&gt;</code>.</p>
+<h3>Step 5: Connect your&nbsp;slaves</h3>
+<p>Now you have a master server running, is time to start a couple of slave servers to get the job done. To start a slave 
+server you have to type the following command running from your Spark installation folder, using the <span class="caps">URL</span> you copied from 
+master server web&nbsp;interface:</p>
+<div class="highlight"><pre><span></span>$ ./sbin/start-slave.sh &lt;your_master_url&gt;
+</pre></div>
+
+
+<p>You should see an output very similar to the master&#8217;s&nbsp;one.</p>
+<p>Perform this operation in every computer you want to connect to the cluster. In this tutorial I am going to run 2&nbsp;slaves.</p>
+<p>After that, if you go to the master server web interface again you should see several rows in the &#8216;Workers&#8217; section where, 
+one per slave server you started. There is also useful info like worker&#8217;s memory, status, cores used and&nbsp;ip.</p>
+<p><img alt="master slaves_web ui" src="{static}/images/posts/spark_cluster/master_slave_web_ui.png" title="Master Web UI with Workers"></p>
+<p>You can also click the links in the Spark web app and go to worker&#8217;s page and tasks page. As you don&#8217;t have any running 
+app connected to the cluster, you can&#8217;t access running and completed tasks&nbsp;page.</p>
+<p>So far you have a fully working Spark cluster&nbsp;running.</p>
+<h3>Step 6: Integration with&nbsp;Jupyter</h3>
+<p>To get the most out of Spark is a good idea integrating with some interactive tool like Jupyter. If you already have 
+Jupyter installed and running, skip the following lines where I explain how to set up a local Jupyter&nbsp;server.</p>
+<h4>Installing&nbsp;Jupyter</h4>
+<p>The easiest way to install Jupyter is probably using <a href="https://conda.io/docs/intro.html">conda</a> 
+(package, dependency and environment management). If you have <a href="https://www.continuum.io/downloads">Anaconda Python distribution</a>, 
+conda is already installed in your computer. If not, I strongly recommend you giving Anaconda a try, it really worth it. 
+In case you don&#8217;t want to install the full Anaconda Python (it includes a lot of libraries and needs about 350 Mb of disk) 
+you can opt for Miniconda, a lighter version which only includes Python and&nbsp;conda.</p>
+<p>If you are using command line, just download the installation file (shell script) using curl and execute it with <code>'./'</code></p>
+<p>Once you have conda installed in your computer, let&#8217;s create a conda virtual environment called <code>jupyter</code> to avoid 
+messing the root&nbsp;one:</p>
+<div class="highlight"><pre><span></span>$ conda create -n jupyter
+</pre></div>
+
+
+<p>Now have a clean virtual environment to install Jupyter on it. To activate this environment&nbsp;type:</p>
+<div class="highlight"><pre><span></span>$ <span class="nb">source</span> activate jupyter
+</pre></div>
+
+
+<p>With the environment activated you should see <code>(jupyter)</code> at the beginning of your command prompt. Something like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="err">(jupyter) david@david-MacBookAir:~$</span>
+</pre></div>
+
+
+<p>It means that your environment is activated and all changes you do hereinafter (installing libraries, etc.) will be 
+applied to this conda virtual&nbsp;environment.</p>
+<p>To install Jupyter, type the following&nbsp;command:</p>
+<div class="highlight"><pre><span></span><span class="err">(jupyter) $ conda install notebook</span>
+</pre></div>
+
+
+<p>This command will install Jupyter notebook and all its dependencies (IPython, Jupyter, etc.) so you don&#8217;t have to worry 
+about setting all these things up (thanks to conda package&nbsp;manager!).</p>
+<p>Now it&#8217;s time to launch a Jupyter notebook and test your installation.&nbsp;Type:</p>
+<div class="highlight"><pre><span></span><span class="err">(jupyter) $ jupyter notebook</span>
+</pre></div>
+
+
+<p>If Jupyter is properly installed you should be able to go <code>localhost:8888/tree</code> <span class="caps">URL</span> in a web browser and see Jupyter folder&nbsp;tree.</p>
+<p><img alt="jupyter_notebook_tree" src="{static}/images/posts/spark_cluster/jupyter_notebook_tree.png" title="Jupyter Notebook Folder Tree"></p>
+<h4>Installing&nbsp;findspark</h4>
+<p>findspark is a Python library that automatically allow you to import and use PySpark as any other Python library. There 
+are other options to make the integration (create a jupyter profile for Spark) but up to date findspark is imho the 
+faster and simpler&nbsp;one.</p>
+<p>To install findspark run the following&nbsp;command:</p>
+<div class="highlight"><pre><span></span><span class="err">(jupyter) $ pip install findspark</span>
+</pre></div>
+
+
+<p>Now you have findpark installed in your jupyter virtual environment. Let&#8217;s create your first&nbsp;application.</p>
+<h4>Create your first Spark&nbsp;application</h4>
+<p>To create your first Spark app and start to make cool things with data, run the following script in a Jupyter&nbsp;cell:</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">findspark</span>
+
+<span class="n">findspark</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
+
+<span class="kn">import</span> <span class="nn">pyspark</span>
+
+<span class="n">sc</span> <span class="o">=</span> <span class="n">pyspark</span><span class="o">.</span><span class="n">SparkContext</span><span class="p">(</span><span class="n">master</span><span class="o">=</span><span class="s1">&#39;&lt;your_master_url&gt;&#39;</span><span class="p">,</span> <span class="n">appName</span><span class="o">=</span><span class="s1">&#39;&lt;your_app_name&gt;&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>This script just initialize findspark so you can import PySpark as a library, and create an instance of Spark Context with 
+your master <span class="caps">URL</span> and app name (up to you) as&nbsp;parameters.</p>
+<p>To test everything works well, you can display sc in your Jupyter notebook and should see an output like&nbsp;this:</p>
+<p><img alt="jupyter_notebook_spark_context" src="{static}/images/posts/spark_cluster/jupyter_notebook_spark_context.png" title="Jupyter Notebook Spark Context"></p>
+<p>You can click the link and go to your app web ui, which is very interesting while you a running long&nbsp;tasks.</p>
+<p>You should also connect to your master server web interface (<code>localhost:8080</code> or <code>&lt;your_master_ip&gt;:8080</code>) and see a new row 
+in Running Applications section, like&nbsp;this:</p>
+<p><img alt="master_app_web_ui" src="{static}/images/posts/spark_cluster/master_app_web_ui.png" title="Master Web UI with Spark Application"></p>
+<p>To turn off your master and slaves servers, use the following commands from your Spark installation&nbsp;directory:</p>
+<div class="highlight"><pre><span></span>$ ./sbin/stop-master.sh
+$ ./sbin/stop-slave.sh
+</pre></div>
+
+
+<p>To deactivate your jupyter conda virtual environment, just run the following&nbsp;command:</p>
+<div class="highlight"><pre><span></span><span class="err">(jupyter) $ source deactivate jupyter</span>
+</pre></div>
+
+
+<p>And that&#8217;s&nbsp;all!</p>
+<p>There are many other things you can tweak and configure about Spark! If people is interested, I will create more content 
+about this amazing technology in the future as I am still learning new concepts&nbsp;everyday.</p>
+<p>Hope you found this tutorial useful. If you see any error, bug, errand or whatever, just tell me or leave a comment and I 
+will try to fix it&nbsp;asap.</p>
+    </article>
+
+        <div class="tags">
+            <p>tags: <a href="../tag/apache-spark.html">Apache Spark</a>, <a href="../tag/python.html">Python</a>, <a href="../tag/big-data.html">Big Data</a>, <a href="../tag/jupyter.html">Jupyter</a>, <a href="../tag/data-science.html">Data Science</a></p>
+        </div>
+
+    <hr>
+
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                            <li>
+                                <a href="https://twitter.com/msalah_abdo">
+                                    <span class="fa-stack fa-lg">
+                                        <i class="fa fa-circle fa-stack-2x"></i>
+                                        <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://github.com/mabdo250e">
+                                    <span class="fa-stack fa-lg">
+                                        <i class="fa fa-circle fa-stack-2x"></i>
+                                        <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.facebook.com/msalah250">
+                                    <span class="fa-stack fa-lg">
+                                        <i class="fa fa-circle fa-stack-2x"></i>
+                                        <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.linkedin.com/in/msalah-abdo/">
+                                    <span class="fa-stack fa-lg">
+                                        <i class="fa fa-circle fa-stack-2x"></i>
+                                        <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                    </span>
+                                </a>
+                            </li>
+                    </ul>
+<p class="copyright text-muted">
+    Blog powered by <a href="http://getpelican.com">Pelican</a>,
+    which takes great advantage of <a href="http://python.org">Python</a>. <br />        &copy;  Mohamed Abdo
+</p>                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- jQuery -->
+    <script src="../theme/js/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../theme/js/bootstrap.min.js"></script>
+
+        <!-- Custom Theme JavaScript -->
+        <script src="../theme/js/clean-blog.min.js"></script>
+
+</body>
+
+</html>

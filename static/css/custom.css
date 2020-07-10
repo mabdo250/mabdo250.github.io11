@@ -1,0 +1,21 @@
+/*.dataframe {*/
+/*    display: block;*/
+/*    overflow: auto;*/
+/*    border: black;*/
+/*}*/
+
+.post-heading h1,
+.page-heading h1{
+    display: inline;
+    background-color: rgba(0, 139, 139, 0.6);
+}
+
+.post-heading h3,
+.page-heading .subheading{
+    display: inline;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+p img{
+    width: 100%;
+}
