@@ -2,7 +2,7 @@ Title: Medical Appointments
 Date: 7/10/2020
 Category: MyProjects
 Tags: Kaggle, Data Analysis, Pandas, Jupyter, Python
-Slug: Medical_Appointments
+Slug: MedicalAppointments
 Authors: Mohamed Abdo
 Summary: Analysis of a kaggle dataset containing 100k medical appointments in Brazil.
 Header_Cover: images/posts/Medical_Appointments/hospital.jpg

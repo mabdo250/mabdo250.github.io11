@@ -2,7 +2,7 @@ Title: Analyze A/B Test Results
 Date: 7/10/2020
 Category: MyProjects
 Tags:  Data Analysis, Pandas, Jupyter, Python
-Slug: AB_Test
+Slug: ABTest
 Authors: Mohamed Abdo
 Summary: Analysis of a kaggle dataset containing 100k medical appointments in Brazil.
 Header_Cover: images/posts/Test/office.jpg
