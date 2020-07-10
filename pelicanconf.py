@@ -22,7 +22,7 @@ SITESUBTITLE = '&#x1F52C; Data Analyst | &#128104;&#8205;&#9877;&#65039; Medical
 
 SITEURL = ''
 PATH = 'content'
-
+FAVICON = 'favicon.ico'
 BASE_PATH = os.path.dirname(os.path.abspath(__file__))
 STATIC_PATHS = ['images', 'static', 'extra/favicon.ico']
 EXTRA_PATH_METADATA = {'extra/favicon.ico': {'path': 'favicon.ico'}}
