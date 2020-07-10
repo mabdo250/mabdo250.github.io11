@@ -24,7 +24,7 @@ SITEURL = ''
 PATH = 'content'
 
 BASE_PATH = os.path.dirname(os.path.abspath(__file__))
-STATIC_PATHS = ['images', 'static', 'extra', 'downloads']
+STATIC_PATHS = ['images', 'static', 'extra/favicon.ico']
 EXTRA_PATH_METADATA = {'extra/favicon.ico': {'path': 'favicon.ico'}}
 
 #ARTICLE_URL = 'posts/{date:%Y}/{date:%m}/{slug}/'
